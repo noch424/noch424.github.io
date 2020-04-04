@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+<head>
+		<meta charset="UTF-8">
+		<title>ZZZZZZZZZZZZZZZ</title>
+		<script src="js/jquery-3.4.0.min.js"></script>
+		<script src="js/jquery.fancybox.js"></script>
+		<link rel="stylesheet" type="text/css" href="css/jquery.fancybox.css"/>
+</head>
+<style>
+	@font-face {font-family: LemonMilkRus; src: url(fonts/LemonMilkRus.otf);}
+	.tabs>input {display:none;}
+	.tabs>div {display: none;}
+	.tabs>label {cursor:pointer; font-size: 16pt; display: inline-block; border: 3px solid rgba(0,0,0,0); padding: 2px; width: 29px; line-height: 29px; text-align: center; margin: 0 5px;}
+	#tab_1:checked ~ #spisok_1, #tab_2:checked ~ #spisok_2, #tab_3:checked ~ #spisok_3, #tab_4:checked ~ #spisok_4,
+	#tab_5:checked ~ #spisok_5, #tab_6:checked ~ #spisok_6, #tab_7:checked ~ #spisok_7, #tab_8:checked ~ #spisok_8,
+	#tab_9:checked ~ #spisok_9, #tab_10:checked ~ #spisok_10, #tab_11:checked ~ #spisok_11, #tab_12:checked ~ #spisok_12,
+	#tab_13:checked ~ #spisok_13, #tab_14:checked ~ #spisok_14, #tab_15:checked ~ #spisok_15, #tab_16:checked ~ #spisok_16,
+	#tab_17:checked ~ #spisok_17, #tab_18:checked ~ #spisok_18, #tab_19:checked ~ #spisok_19, #tab_20:checked ~ #spisok_20,
+	#tab_21:checked ~ #spisok_21, #tab_22:checked ~ #spisok_22, #tab_23:checked ~ #spisok_23, #tab_24:checked ~ #spisok_24,
+	#tab_25:checked ~ #spisok_25, #tab_26:checked ~ #spisok_26, #tab_27:checked ~ #spisok_27 {display: block;}
+	.tabs>input:checked + label {border: 3px solid white; border-radius: 20px;}
+	.spisok {position: relative; padding-top: 15px; text-align: left; left: 30px;}
+	.spisok>a {color: white;}
+	.spisok>a:visited {color: white;}
+	.fancybox-thumbs {
+		top: auto;
+		width: auto;
+		bottom: 0;
+		left: 0;
+		right : 0;
+		height: 95px;
+		padding: 10px 10px 5px 10px;
+		box-sizing: border-box;
+		background: rgba(0, 0, 0, 0.3);
+	}
+	.fancybox-show-thumbs .fancybox-inner {right: 0; bottom: 95px;}
+	.pl_buttons {
+		cursor: pointer;
+		border: 1px solid grey;
+		padding: 7px 16px;
+		font-family: LemonMilkRus;
+		font-size: 15pt;
+		line-height: 20px;
+		border-radius: 8px;
+		margin-bottom: 7px;
+	}
+	.platforma {
+		position: relative;
+		left: 5px;
+		top: 2px;
+		height: 15px;
+		padding-left: 2px;
+	}
+</style>
+<body>
+<div id="games" style="position: relative; width: 780px; color: white;">
+<div id="box_platforms_buttons" style="position: relative; width: 780px;">
+	<div id="platforms_buttons" style="display: flex; flex-wrap: wrap; justify-content: space-between; align-content: space-between;">
+		<div onclick="all_on(), pl_but_style(this.id)" id="pl_but_1" class="pl_buttons" style="padding: 3px 12px; border: 5px solid white; border-radius: 8px;">Все платформы</div>
+	</div>
+</div>
+<div style="position: relative; height: 5px; width: 780px; background: white; border-radius: 3px;"></div>
+<div id="box1" style="position: relative; padding-top: 7px; width: 780px;">
+<div id="tabs_buttons" class="tabs" style="text-align: center;">
+	<div id="line" style="position: relative; margin-top: 7px; height: 5px; width: 780px; background: white; border-radius: 3px; display: block;"></div>
+</div>
+</div>
+<div id="box2" style="position: relative; width: 780px;"></div>
+</div>
+<script>
+var platforms = [
+//	id и название картинки / Подсказка при наведении / Текст кнопки
+["pc","PC","PC"],
+["switch","Nintendo Switch","Switch"],
+["ds","Nintendo DS","DS"],
+["nes","Nintendo Entertainment System","NES"],
+["psv","PlayStation Vita","PSV"],
+["snes","Super Nintendo Entertainment System","SNES"],
+["smd","Sega Mega Drive","SMD"],
+["wii","Nintendo Wii","Wii"],
+["3ds","Nintendo 3DS","3DS"],
+["wii_u","Nintendo Wii U","Wii U"],
+["gba","Game Boy Advance","GBA"],
+["mobile","Mobile","Mobile"],
+["gb","‎Game Boy‎","GB"],
+["gbc","Game Boy Color","GBC"],
+["ps4","PlayStation 4","PS4"]
+];
+
+$.each(platforms, function (a) {
+	$('<div>', {id: "pl_but_"+[a+2], class: "pl_buttons", onclick: "pl_"+platforms[a][0]+"_on(), pl_but_style(this.id)"}).html(platforms[a][2]).appendTo('#platforms_buttons')
+});
+
+var chars = ["#","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z",]
+
+$.each(chars, function (a) {
+	$('<input type="radio" name="letter" id="tab_'+[a+1]+'"><label for="tab_'+[a+1]+'">'+chars[a]+'</label></input>').insertBefore('#line')
+});
+
+$("#tab_1").prop("checked", true);
+
+//	name - Название игры
+//	platform - Платформы на которых есть игра - "pc","switch","ds","nes","psv","snes","smd","wii","3ds","wii_u","gba","mobile","gb","gbc","ps4"
+//	folder - Папка скриншотов игры в images/games, имя папки не должно содержать одиночные и двойные кавычки
+//	screens - Имя всех скриншотов с расширением кроме первого (первый вписан в другом месте - 1.jpg)
+var games=[
+[					// #
+{name: "8 Eyes", platform:["pc","switch","ds","nes","psv","snes","smd","wii","3ds","wii_u","gba","mobile","gb","gbc","ps4"], folder: "8 Eyes", screens:["2.jpg","3.jpg"]}
+],[					// A
+{name: "Adventure Apes and the Mayan Mystery", platform:[], folder: "Adventure Apes and the Mayan Mystery", screens:["2.jpg","3.jpg","4.jpg","5.jpg","6.jpg","7.jpg"]},
+{name: "Adventure Time: Hey Ice King! Why'd You Steal Our Garbage?!", platform:[], folder: "Adventure Time Hey Ice King! Why d You Steal Our Garbage!", screens:["2.jpg","3.jpg","4.jpg"]},
+{name: "Adventure Island IV", platform:[], folder: "Adventure Island IV", screens:["2.jpg","3.jpg","4.jpg"]},
+{name: "Aeternoblade", platform:[], folder: "Aeternoblade", screens:["2.jpg"]},
+{name: "Aeternoblade 2", platform:[], folder: "Aeternoblade 2", screens:["2.jpg"]},
+{name: "Akuji the Demon", platform:[], folder: "Akuji the Demon", screens:["2.jpg","3.jpg","4.jpg"]},
+{name: "Akumajo Special: Boku Dracula-kun", platform:[], folder: "Akumajo Special Boku Dracula-kun", screens:["2.jpg","3.jpg","4.jpg"]},
+{name: "Alice in Wonderland", platform:[], folder: "Alice in Wonderland", screens:["2.jpg","3.jpg"]},
+{name: "Aliens: Infestation", platform:[], folder: "Aliens Infestation", screens:["2.jpg","3.jpg"]},
+{name: "Alwa’s Awakening", platform:[], folder: "Alwa’s Awakening", screens:["2.jpg","3.jpg","4.jpg","5.jpg","6.jpg","7.jpg","8.jpg","9.jpg","10.jpg"]},
+{name: "AM2R (Another Metroid 2 Remake)", platform:[], folder: "AM2R", screens:["2.jpg","3.jpg","4.jpg"]},
+{name: "Apotheon", platform:[], folder: "Apotheon", screens:["2.jpg","3.jpg","4.jpg","5.jpg","6.jpg"]},
+{name: "Aquaria ★", platform:[], folder: "Aquaria", screens:["2.jpg","3.jpg","4.jpg","5.jpg","6.jpg"]},
+{name: "Atlantis no Nazo", platform:[], folder: "Atlantis no Nazo", screens:["2.jpg","3.jpg"]},
+{name: "Axiom Verge ★", platform:[], folder: "Axiom Verge", screens:["2.jpg","3.jpg","4.jpg","5.jpg","6.jpg","7.jpg"]},
+{name: "Axiom Verge 2", platform:[], folder: "Axiom Verge 2", screens:["2.jpg","3.jpg","4.jpg","5.jpg","6.jpg","7.jpg","8.jpg","9.jpg","10.jpg","11.jpg"]},
+{name: "Aztaka", platform:[], folder: "Aztaka", screens:["2.jpg","3.jpg","4.jpg","5.jpg","6.jpg"]}
+],[					// B
+{name: "Batman: Arkham Origins Blackgate", platform:[], folder: "", screens:[]},
+{name: "Battle Kid 2: Mountain of Torment", platform:[], folder: "", screens:[]},
+{name: "Battle Kid: Fortress of Peril", platform:[], folder: "", screens:[]},
+{name: "Bionic Commando", platform:[], folder: "", screens:[]},
+{name: "Blasphemous", platform:[], folder: "", screens:[]},
+{name: "Blaster Master ★", platform:[], folder: "", screens:[]},
+{name: "Blaster Master 2", platform:[], folder: "", screens:[]},
+{name: "Blaster Master: Overdrive", platform:[], folder: "", screens:[]},
+{name: "Blaster Master Zero ★", platform:[], folder: "", screens:[]},
+{name: "Blaster Master Zero 2 ★", platform:[], folder: "", screens:[]},
+{name: "Bloodstained: Curse of the Moon ★", platform:[], folder: "", screens:[]},
+{name: "Bloodstained: Ritual of the Night ★", platform:[], folder: "", screens:[]},
+{name: "Bloody Vampire", platform:[], folder: "", screens:[]},
+{name: "Brain Breaker", platform:[], folder: "", screens:[]},
+{name: "Bunny Must Die: Chelsea and the 7 Devils", platform:[], folder: "", screens:[]}
+],[					// C
+{name: "Chasm", platform:[], folder: "", screens:[]},
+{name: "Castle In The Darkness", platform:[], folder: "", screens:[]},
+{name: "Castle In The Darkness 2", platform:[], folder: "", screens:[]},
+{name: "Castlevania: Spectral Interlude", platform:[], folder: "", screens:[]},
+{name: "Castlevania 2: Simon's Quest", platform:[], folder: "", screens:[]},
+{name: "Castlevania: Symphony of the Night ★", platform:[], folder: "", screens:[]},
+{name: "Castlevania: Circle of the Moon ★", platform:[], folder: "", screens:[]},
+{name: "Castlevania: Harmony of Dissonance ★", platform:[], folder: "", screens:[]},
+{name: "Castlevania: Portrait of Ruin ★", platform:[], folder: "", screens:[]},
+{name: "Castlevania: Order of Shadows", platform:[], folder: "", screens:[]},
+{name: "Castlevania: Order of Ecclesia ★", platform:[], folder: "", screens:[]},
+{name: "Castlevania: Aria of Sorrow ★", platform:[], folder: "", screens:[]},
+{name: "Castlevania: Dawn of Sorrow ★", platform:[], folder: "", screens:[]},
+{name: "Cathedral", platform:[], folder: "", screens:[]},
+{name: "Catmaze", platform:[], folder: "", screens:[]},
+{name: "Cave Story ★", platform:[], folder: "", screens:[]},
+{name: "Celestial Mechanica", platform:[], folder: "", screens:[]},
+{name: "Citadale: The Legends Trilogy", platform:[], folder: "", screens:[]},
+{name: "Clash at Demonhead", platform:[], folder: "", screens:[]},
+{name: "Codename: Droid", platform:[], folder: "", screens:[]},
+{name: "Cosmo Police Galivan", platform:[], folder: "", screens:[]}
+],[					// D
+{name: "Dandara", platform:[], folder: "", screens:[]},
+{name: "Daniel X: The Ultimate Power", platform:[], folder: "", screens:[]},
+{name: "Dark Devotion R", platform:[], folder: "", screens:[]},
+{name: "Dark Incursion", platform:[], folder: "", screens:[]},
+{name: "Dark Matter", platform:[], folder: "", screens:[]},
+{name: "Dark Void Zero", platform:[], folder: "", screens:[]},
+{name: "Dead Cells R", platform:[], folder: "", screens:[]},
+{name: "Demon's Crest", platform:[], folder: "", screens:[]},
+{name: "Demon Hunter – The Return of the Wings", platform:[], folder: "", screens:[]},
+{name: "Demoniaca: Everlasting Night", platform:[], folder: "", screens:[]},
+{name: "Dex", platform:[], folder: "", screens:[]},
+{name: "Dr. Franken l and II", platform:[], folder: "", screens:[]},
+{name: "Dust: An Elysian Tail", platform:[], folder: "", screens:[]}
+],[					// E
+{name: "Elemental Rage", platform:[], folder: "", screens:[]},
+{name: "Eternal Daughter", platform:[], folder: "", screens:[]},
+{name: "Euphory", platform:[], folder: "", screens:[]},
+{name: "Evil Genome", platform:[], folder: "", screens:[]},
+{name: "Exile’s End", platform:[], folder: "", screens:[]},
+{name: "Ex Vitro", platform:[], folder: "", screens:[]},
+{name: "Exodus", platform:[], folder: "", screens:[]}
+],[					// F
+{name: "Fantastic Children", platform:[], folder: "", screens:[]},
+{name: "Faxanadu", platform:[], folder: "", screens:[]},
+{name: "Flushed Away", platform:[], folder: "", screens:[]},
+{name: "Frogatto & Friends", platform:[], folder: "", screens:[]},
+{name: "Front Mission: Gun Hazard", platform:[], folder: "", screens:[]}
+],[					// G
+{name: "Gargoyle s Quest", platform:[], folder: "", screens:[]},
+{name: "Gargoyle's Quest 2", platform:[], folder: "", screens:[]},
+{name: "Ganbare Goemon 2", platform:[], folder: "", screens:[]},
+{name: "Ghoul School", platform:[], folder: "", screens:[]},
+{name: "Ghost 1.0", platform:[], folder: "", screens:[]},
+{name: "G.I. Joe: The Atlantis Factor", platform:[], folder: "", screens:[]},
+{name: "Green Lantern: Rise of the Manhunters", platform:[], folder: "", screens:[]},
+{name: "Grokion", platform:[], folder: "", screens:[]},
+{name: "Guacamelee!", platform:[], folder: "", screens:[]},
+{name: "Guacamelee! 2", platform:[], folder: "", screens:[]}
+],[					// H
+{name: "Hasslevania: The Quest For Shuteye", platform:[], folder: "", screens:[]},
+{name: "Hero Core", platform:[], folder: "", screens:[]},
+{name: "Heart Forth, Alicia", platform:[], folder: "", screens:[]},
+{name: "Headlander", platform:[], folder: "", screens:[]},
+{name: "Hollow Knight ★", platform:[], folder: "", screens:[]},
+{name: "Holy Umbrella: Dondera no Mubou", platform:[], folder: "", screens:[]},
+{name: "Hotel Transylvania", platform:[], folder: "", screens:[]},
+{name: "Hunter X Hunter: Kindan no Hihou", platform:[], folder: "", screens:[]},
+{name: "Hydra Castle Labyrinth", platform:[], folder: "", screens:[]}
+],[					// I
+{name: "Iconoclasts", platform:[], folder: "", screens:[]},
+{name: "I Dig It", platform:[], folder: "", screens:[]},
+{name: "Iji", platform:[], folder: "", screens:[]},
+{name: "Ikachan (PC 2000)", platform:[], folder: "", screens:[]},
+{name: "In 60 Seconds (PC 2009)", platform:[], folder: "", screens:[]},
+{name: "Inescapable (PC 2014)", platform:[], folder: "", screens:[]},
+{name: "Inferus (PC/XBLA 2009)", platform:[], folder: "", screens:[]},
+{name: "Insanely Twisted Shadow Planet (Xbox 360 2011)", platform:[], folder: "", screens:[]},
+{name: "Insidia (Newsgrounds.com 2010)", platform:[], folder: "", screens:[]},
+{name: "I Wanna Be the Guy (PC 2007)", platform:[], folder: "", screens:[]}
+],[					// J
+{name: "Jable's Adventure (PC 2009)", platform:[], folder: "", screens:[]},
+{name: "Jottobots (PC 2011)", platform:[], folder: "", screens:[]}
+],[					// K
+{name: "Kid Dracula (GB 1993)", platform:[], folder: "", screens:[]},
+{name: "Kid Icarus (NES 1987)", platform:[], folder: "", screens:[]},
+{name: "Kid Icarus: Of Myths and Monsters (GB 1991)", platform:[], folder: "", screens:[]},
+{name: 'Kirby Super Star, "The Great Cave Offensive" (SNES 1996)', platform:[], folder: "", screens:[]},
+{name: "Kirby & the Amazing Mirror (GBA 2004)", platform:[], folder: "", screens:[]},
+{name: "Knightmare II: The Maze of Galious (MSX 1987)", platform:[], folder: "", screens:[]},
+{name: "Knytt Stories (PC 2007)", platform:[], folder: "", screens:[]},
+{name: "Kodachrome (Kongregate.com 2012)", platform:[], folder: "", screens:[]},
+{name: "K.O.L.M. (ArmorGames.com 2010)", platform:[], folder: "", screens:[]},
+{name: "Konami Krazy Racers (GBA 2001)", platform:[], folder: "", screens:[]},
+{name: "Konami WaiWai Sokoban (Mobile 2007)", platform:[], folder: "", screens:[]},
+{name: "Koumajou Densetsu Scarlet Symphony (PC 2009)", platform:[], folder: "", screens:[]},
+{name: "Kung Fu Panda (2008)", platform:[], folder: "", screens:[]},
+{name: "Kurovadis (PC 2012)", platform:[], folder: "", screens:[]}
+],[					// L
+{name: "Laika Believes (PC/XBLA TBA)", platform:[], folder: "", screens:[]},
+{name: "La-Mulana", platform:[], folder: "", screens:[]},
+{name: "LaTale (PC 2006)", platform:[], folder: "", screens:[]},
+{name: "Legend of Iya (PC TBA)", platform:[], folder: "", screens:[]},
+{name: "Legacy of Kain: Soul Reaver (PS/PC 1999)", platform:[], folder: "", screens:[]},
+{name: "Legend of Kalevala (Flash/PC)", platform:[], folder: "", screens:[]},
+{name: "Legacy of the Wizard (NES 1987)", platform:[], folder: "", screens:[]},
+{name: "Legend of Princess (PC 2009)", platform:[], folder: "", screens:[]},
+{name: "Level Up! (Newgrounds.com 2009)", platform:[], folder: "", screens:[]},
+{name: "LostWinds (WiiWare 2008)", platform:[], folder: "", screens:[]},
+{name: "LostWinds: Winter of the Melodias (WiiWare 2009)", platform:[], folder: "", screens:[]},
+{name: "Lyle in Cube Sector (PC 2006)", platform:[], folder: "", screens:[]}
+],[					// M
+{name: "Magicians and Looters (PC 2014)", platform:[], folder: "", screens:[]},
+{name: "Majin and the Forsaken Kingdom (PS3/Xbox 360 2010)", platform:[], folder: "", screens:[]},
+{name: "Manoria (PC 2007)", platform:[], folder: "", screens:[]},
+{name: "MapleStory (PC 2003)", platform:[], folder: "", screens:[]},
+{name: "Mark of the Ninja (PC 2012)", platform:[], folder: "", screens:[]},
+{name: "Marvin's Mittens (PC 2014)", platform:[], folder: "", screens:[]},
+{name: "Master of Darkness (SMS 1992)", platform:[], folder: "", screens:[]},
+{name: "Mega Man Legends (PS 1997)", platform:[], folder: "", screens:[]},
+{name: "Mega Man Legends 2 (PS 2000)", platform:[], folder: "", screens:[]},
+{name: "Mega Man Zero (GBA 2002)", platform:[], folder: "", screens:[]},
+{name: "Mega Man ZX (DS 2006)", platform:[], folder: "", screens:[]},
+{name: "Mega Man ZX Advent (DS 2007)", platform:[], folder: "", screens:[]},
+{name: "Metamorfose S (PC 2017)", platform:[], folder: "", screens:[]},
+{name: "Metroid (NES 1986)", platform:[], folder: "", screens:[]},
+{name: "Metroid II: Return of Samus (GB 1991)", platform:[], folder: "", screens:[]},
+{name: "Metroid Fusion (GBA 2002)", platform:[], folder: "", screens:[]},
+{name: "Metroid: Other M (Wii 2010)", platform:[], folder: "", screens:[]},
+{name: "Metroid Prime (GC 2002)", platform:[], folder: "", screens:[]},
+{name: "Metroid Prime 2: Echoes (GC 2004)", platform:[], folder: "", screens:[]},
+{name: "Metroid Prime 3: Corruption (Wii 2007)", platform:[], folder: "", screens:[]},
+{name: "Metroid: Samus Returns (3DS)", platform:[], folder: "", screens:[]},
+{name: "Mighty Switch Force! (eShop 2011)", platform:[], folder: "", screens:[]},
+{name: "Milon's Secret Castle (NES 1986)", platform:[], folder: "", screens:[]},
+{name: "Milon's Secret Castle (Game Boy 1993)", platform:[], folder: "", screens:[]},
+{name: "Minoria", platform:[], folder: "", screens:[]},
+{name: "MindSeize", platform:[], folder: "", screens:[]},
+{name: "Momodora II (PC 2011)", platform:[], folder: "", screens:[]},
+{name: "Momodora: Reverie Under the Moonlight", platform:[], folder: "", screens:[]},
+{name: "Monster House (GBA 2006)", platform:[], folder: "", screens:[]},
+{name: "Monster Tale (DS 2011)", platform:[], folder: "", screens:[]},
+{name: "Monster World IV (GEN 1994)", platform:[], folder: "", screens:[]},
+{name: "Montezuma's Revenge: Featuring Panama Joe (Atari 2600 1984)", platform:[], folder: "", screens:[]},
+{name: "Montezuma's Return (GB/GBC 1998)", platform:[], folder: "", screens:[]},
+{name: "Muramasa: The Demon Blade (Wii 2009)", platform:[], folder: "", screens:[]},
+{name: "Mustache King Adventure (PC 2012)", platform:[], folder: "", screens:[]},
+{name: "Mystery of the Japanese Werewolf (iPhone/iPod 2011)", platform:[], folder: "", screens:[]}
+],[					// N
+{name: "New International Track and Field (DS 2008)", platform:[], folder: "", screens:[]},
+{name: "Night n' Grail (Commodore 64 2009)", platform:[], folder: "", screens:[]},
+{name: "Nimble Lord (Подземный Поход // Ловкий Лорд)", platform:[], folder: "", screens:[]}
+],[					// O
+{name: "Odallus: The Dark Call", platform:[], folder: "", screens:[]},
+{name: "Odin Sphere (PS2 PS Vita 2007)", platform:[], folder: "", screens:[]},
+{name: "Okami (PS2 2006)", platform:[], folder: "", screens:[]},
+{name: "Oliver’s Adventures in the Fairyland", platform:[], folder: "", screens:[]},
+{name: "Ophidian Wars: Opac's Journey (Xbox 360 2010)", platform:[], folder: "", screens:[]},
+{name: 'Ore ga Omae o Mamoru or "I Will Protect You" (DS 2009)', platform:[], folder: "", screens:[]},
+{name: "Ori and the Blind Forest", platform:[], folder: "", screens:[]},
+{name: "Outland (PSN/XBLA 2011)", platform:[], folder: "", screens:[]},
+{name: "Owlboy", platform:[], folder: "", screens:[]}
+],[					// P
+{name: "Painajainen (PC 2006)", platform:[], folder: "", screens:[]},
+{name: "Penguin no Mondai: Saikyou Penguin Densetsu! (DS 2008)", platform:[], folder: "", screens:[]},
+{name: "Penguin no Mondai: Tenkuu no 7 Senshi (DS 2009)", platform:[], folder: "", screens:[]},
+{name: "Phantom 2040 (SNES, GEN 1995)", platform:[], folder: "", screens:[]},
+{name: "Pharaoh Rebirth +", platform:[], folder: "", screens:[]},
+{name: "Phoenix Spirit (iPhone 2010)", platform:[], folder: "", screens:[]},
+{name: "Phoenotpia", platform:[], folder: "", screens:[]},
+{name: "Pieces; (JayIsGames.com 2008)", platform:[], folder: "", screens:[]},
+{name: "Poacher (PC/Mac 2012)", platform:[], folder: "", screens:[]},
+{name: "Popful Mail (SNES 1994)", platform:[], folder: "", screens:[]},
+{name: "Pop'n Music 15 Adventure (Arcade 2007)", platform:[], folder: "", screens:[]},
+{name: "PowerSlave (Saturn/PC/PlayStation 1996-1997)", platform:[], folder: "", screens:[]},
+{name: "Prince of Persia - The Sands of Time (GBA)", platform:[], folder: "", screens:[]},
+{name: "PRIOR (Kongregate.com 2011)", platform:[], folder: "", screens:[]},
+{name: "Project Black Sun (PC/Mac 2011)", platform:[], folder: "", screens:[]},
+{name: "Pyuu to Fuku! Jaguar Byuu to Deru! Megane-Kun (GBA 2004)", platform:[], folder: "", screens:[]}
+],[					// Q
+{name: "", platform:[], folder: "", screens:[]}
+],[					// R
+{name: "Rambo (NES 1987)", platform:[], folder: "", screens:[]},
+{name: "Redder (Newgrounds.com 2010)", platform:[], folder: "", screens:[]},
+{name: "REDO!", platform:[], folder: "", screens:[]},
+{name: "Return of Egypt (PC 2003)", platform:[], folder: "", screens:[]},
+{name: "Robot Wants Fishy (Newgrounds.com 2010)", platform:[], folder: "", screens:[]},
+{name: "Robot Wants Ice Cream (Newgrounds.com 2010)", platform:[], folder: "", screens:[]},
+{name: "Robot Wants Jay Is Games Banner (JayIsGames.com 2010)", platform:[], folder: "", screens:[]},
+{name: "Robot Wants Kitty (iPhone/iPad 2011)", platform:[], folder: "", screens:[]},
+{name: "Robot Wants Kitty (Newgrounds.com 2010)", platform:[], folder: "", screens:[]},
+{name: "Robot Wants Puppy (Newgrounds.com 2010)", platform:[], folder: "", screens:[]},
+{name: "Robox (WiiWare 2010)", platform:[], folder: "", screens:[]},
+{name: "Rochard (XBLA 2011)", platform:[], folder: "", screens:[]},
+{name: "Rogue Legacy", platform:[], folder: "", screens:[]},
+{name: "Rusty (PC98 1993)", platform:[], folder: "", screens:[]},
+{name: "Rygar (NES 1987)", platform:[], folder: "", screens:[]}
+],[					// S
+{name: "Saira (PC 2009)", platform:[], folder: "", screens:[]},
+{name: "Salt and Sanctuary", platform:[], folder: "", screens:[]},
+{name: "Samurai Jack: The Amulet of Time (GBA 2003)", platform:[], folder: "", screens:[]},
+{name: "Sanzu Fortress (PC 2010)", platform:[], folder: "", screens:[]},
+{name: "Scurge: Hive (GBA 2006)", platform:[], folder: "", screens:[]},
+{name: "Scurge: Hive (DS 2006)", platform:[], folder: "", screens:[]},
+{name: "Shaman King: Master of Spirits (GBA 2002)", platform:[], folder: "", screens:[]},
+{name: "Shaman King: Master of Spirits 2 (GBA 2005)", platform:[], folder: "", screens:[]},
+{name: "Snailiad (Newgrounds.com 2011)", platform:[], folder: "", screens:[]},
+{name: "Shantae (GBC 2002)", platform:[], folder: "", screens:[]},
+{name: "Shantae: Half-Genie Hero", platform:[], folder: "", screens:[]},
+{name: "Shantae and the Pirate's Curse", platform:[], folder: "", screens:[]},
+{name: "Shantae: Risky's Revenge (DSiWare 2010)", platform:[], folder: "", screens:[]},
+{name: "Shadow Complex Remastered", platform:[], folder: "", screens:[]},
+{name: "Singlehandedly (PC 2011)", platform:[], folder: "", screens:[]},
+{name: "Sketchy (PC 2006)", platform:[], folder: "", screens:[]},
+{name: "Soul of Darkness (Mobile 2008)", platform:[], folder: "", screens:[]},
+{name: "Soul of Darkness (DSiWare 2010)", platform:[], folder: "", screens:[]},
+{name: "Space Barnacle (PC 2007)", platform:[], folder: "", screens:[]},
+{name: "Spider-Man (GBC 2000)", platform:[], folder: "", screens:[]},
+{name: "Spider-Man: Edge of Time (DS 2011)", platform:[], folder: "", screens:[]},
+{name: "Spider-Man: Shattered Dimensions (DS 2010)", platform:[], folder: "", screens:[]},
+{name: "Spider-Man: Web of Shadows (DS 2008)", platform:[], folder: "", screens:[]},
+{name: "SteamWorld Dig", platform:[], folder: "", screens:[]},
+{name: "SteamWorld Dig 2", platform:[], folder: "", screens:[]},
+{name: "Strider", platform:[], folder: "", screens:[]},
+{name: "Subbania (PC 2012)", platform:[], folder: "", screens:[]},
+{name: "Sundered (PC 2017)", platform:[], folder: "", screens:[]},
+{name: "Super Adventure Island II (SNES 1995)", platform:[], folder: "", screens:[]},
+{name: "SuperEpic: The Entertainment War", platform:[], folder: "", screens:[]},
+{name: "Super Mario 64 (N64 1996)", platform:[], folder: "", screens:[]},
+{name: "Super Mario 64 DS (DS 2004)", platform:[], folder: "", screens:[]},
+{name: "Super Mario Sunshine (GC 2002)", platform:[], folder: "", screens:[]},
+{name: "Super Metroid ★", platform:[], folder: "", screens:[]},
+{name: "Super Panda Adventures", platform:[], folder: "", screens:[]},
+{name: "Super Pitfall (NES 1986)", platform:[], folder: "", screens:[]},
+{name: 'Super Smash Bros. Brawl, "The Great Maze" (Wii 2008)', platform:[], folder: "", screens:[]},
+{name: "Swordigo (iPhone/iPod 2012)", platform:[], folder: "", screens:[]}
+],[					// T
+{name: "Tails Adventure (GG 1995)", platform:[], folder: "", screens:[]},
+{name: "Tale of Maledict (PC 2011)", platform:[], folder: "", screens:[]},
+{name: "Teenage Mutant Ninja Turtles III: Radical Rescue (GB 1993)", platform:[], folder: "", screens:[]},
+{name: "Terraria (PC 2011)", platform:[], folder: "", screens:[]},
+{name: "Teslagrad", platform:[], folder: "", screens:[]},
+{name: "The Amazing Spider-Man (DS 2012)", platform:[], folder: "", screens:[]},
+{name: "The Battle of Mount Olympus (NES 1990)", platform:[], folder: "", screens:[]},
+{name: "The Deep (iPhone/iPod 2009)", platform:[], folder: "", screens:[]},
+{name: "The Desolate Hope", platform:[], folder: "", screens:[]},
+{name: "The Divided: Enemies Within (PS/PC 1996)", platform:[], folder: "", screens:[]},
+{name: "The Goonies II (NES 1987)", platform:[], folder: "", screens:[]},
+{name: "The Legend of Spyro: The Eternal Night (GBA 2007)", platform:[], folder: "", screens:[]},
+{name: "The Legend of Zelda: Majora's Mask (N64 2000)", platform:[], folder: "", screens:[]},
+{name: "The Legend of Zelda: Ocarina of Time (N64 1998)", platform:[], folder: "", screens:[]},
+{name: "The Legend of Zelda: Twilight Princess (Wii/GC 2006)", platform:[], folder: "", screens:[]},
+{name: "The Masked Mage", platform:[], folder: "", screens:[]},
+{name: "The Messenger", platform:[], folder: "", screens:[]},
+{name: "The Moonkeeper (Kongregate.com 2012)", platform:[], folder: "", screens:[]},
+{name: "The Power (PC 2008)", platform:[], folder: "", screens:[]},
+{name: "The Power (JayIsGames.com 2012)", platform:[], folder: "", screens:[]},
+{name: "The Powerpuff Girls", platform:[], folder: "", screens:[]},
+{name: "The Underside (PC 2007)", platform:[], folder: "", screens:[]},
+{name: "The Vagrant", platform:[], folder: "", screens:[]},
+{name: "Tim Burton's The Nightmare Before Christmas: The Pumpkin King (GBA 2005)", platform:[], folder: "", screens:[]},
+{name: "Tiny Dangerous Dungeons", platform:[], folder: "", screens:[]},
+{name: "Tomba! (PS 1998)", platform:[], folder: "", screens:[]},
+{name: "Touhou Luna Nights", platform:[], folder: "", screens:[]},
+{name: "Toshi Tensou Keikaku: Eternal City (TG16 1991)", platform:[], folder: "", screens:[]},
+{name: "Treasure Adventure Game (PC 2011)", platform:[], folder: "", screens:[]},
+{name: "Treasure Hunter Man (PC 2008)", platform:[], folder: "", screens:[]},
+{name: "Trine (PC 2009)", platform:[], folder: "", screens:[]},
+{name: "Timespinner", platform:[], folder: "", screens:[]}
+],[					// U
+{name: "Ufouria: The Saga (NES 1991)", platform:[], folder: "", screens:[]},
+{name: "UnEpic", platform:[], folder: "", screens:[]},
+{name: "Usurper", platform:[], folder: "", screens:[]}
+],[					// V
+{name: "Valdis Story: Abyssal City", platform:[], folder: "", screens:[]},
+{name: "Vampire Killer (MSX 1986)", platform:[], folder: "", screens:[]},
+{name: "Vampire: Master of Darkness (GG 1992)", platform:[], folder: "", screens:[]},
+{name: "Vigilance on Talos V (PC 1997)", platform:[], folder: "", screens:[]}
+],[					// W
+{name: "Wai Wai World (Famicom 1988)", platform:[], folder: "", screens:[]},
+{name: "Wai Wai World 2 (Famicom 1991)", platform:[], folder: "", screens:[]},
+{name: "Wai Wai World (Mobile 2006)", platform:[], folder: "", screens:[]},
+{name: "Wario Land 3 (GBC 2000)", platform:[], folder: "", screens:[]},
+{name: "Waking Mars (iPhone/iPod 2012)", platform:[], folder: "", screens:[]},
+{name: "Wario: Master of Disguise (DS 2007)", platform:[], folder: "", screens:[]},
+{name: "William & Sly (Newgrounds.com 2009)", platform:[], folder: "", screens:[]},
+{name: "Within a Deep Forest (PC 2006)", platform:[], folder: "", screens:[]},
+{name: "Wizards & Warriors III: Kuros - Visions of Power (NES 1992)", platform:[], folder: "", screens:[]},
+{name: "Wonder Boy in Monster World (GEN/SMS 1991)", platform:[], folder: "", screens:[]},
+{name: "Wonder Boy III: The Dragon's Trap (SMS 1989)", platform:[], folder: "", screens:[]}
+],[					// X
+{name: "Xeodrifter", platform:[], folder: "", screens:[]}
+],[					// Y
+{name: "You Have to Win the Game (PC 2012)", platform:[], folder: "", screens:[]},
+{name: "Ys III: Wanderers from Ys (SNES 1991)", platform:[], folder: "", screens:[]}
+],[					// Z
+{name: "Zelda II: The Adventure of Link (NES 1988)", platform:[], folder: "", screens:[]},
+{name: "Zeliard (PC 1987)", platform:[], folder: "", screens:[]},
+{name: "Zeta's World (PC 2008)", platform:[], folder: "", screens:[]},
+{name: "Zillion (SMS 1987)", platform:[], folder: "", screens:[]}
+]];
+
+$.each(games, function (a) {
+$('<div>', {id: 'spisok_'+[a+1], class: 'spisok'}).appendTo('.tabs');
+	$.each(games[a], function (b) {
+		$('<a>', {'href':'images/games/'+games[a][b].folder+'/'+'1.jpg','data-fancybox':'gallery_'+[a+1]+'_'+[b+1],'data-thumb':'images/games/'+games[a][b].folder+'/'+'1.jpg', 'id':'id_'+[a+1]+'_'+[b+1]}).text(games[a][b].name).appendTo('#spisok_'+[a+1]).after('<br>');
+		$.each(platforms, function (g) {
+			if ($.inArray(platforms[g][0], games[a][b].platform) != -1) {$('#id_'+[a+1]+'_'+[b+1]).after('<img src="images/platform/'+platforms[g][0]+'.png" title="'+platforms[g][1]+'" class="platforma">')};
+		});
+		$.each(games[a][b].screens, function (c) {
+			$('<a>', {'href':'images/games/'+games[a][b].folder+'/'+games[a][b].screens[c],'data-fancybox':'gallery_'+[a+1]+'_'+[b+1],'data-thumb':'images/games/'+games[a][b].folder+'/'+games[a][b].screens[c]}).appendTo('#spisok_'+[a+1]);
+		});
+	});
+});
+
+$.each(platforms, function (s) {
+	$('<div>', {id: "spisok_"+platforms[s][0], class: 'spisok'}).hide().appendTo('#box2');
+});
+
+$.each(games, function (a) {
+	$.each(games[a], function (b) {
+		$.each(platforms, function (d) {
+			if ($.inArray(platforms[d][0], games[a][b].platform) != -1) {
+				$('<a>', {'href':'images/games/'+games[a][b].folder+'/'+'1.jpg','data-fancybox':'gallery_'+[a+1]+'_'+[b+1]+'_'+platforms[d][0],'data-thumb':'images/games/'+games[a][b].folder+'/'+'1.jpg', 'id':'id_'+[a+1]+'_'+[b+1]+'_pl_'+[d+1]}).text(games[a][b].name).appendTo('#spisok_'+platforms[d][0]).after('<br>');
+				$.each(games[a][b].screens, function (c) {$('<a>', {'href':'images/games/'+games[a][b].folder+'/'+games[a][b].screens[c],'data-fancybox':'gallery_'+[a+1]+'_'+[b+1]+'_'+platforms[d][0],'data-thumb':'images/games/'+games[a][b].folder+'/'+games[a][b].screens[c]}).appendTo('#spisok_'+platforms[d][0]);});
+			};
+			$.each(platforms, function (e) {
+				if ($.inArray(platforms[e][0], games[a][b].platform) != -1) {$('#id_'+[a+1]+'_'+[b+1]+'_pl_'+[d+1]).after('<img src="images/platform/'+platforms[e][0]+'.png" title="'+platforms[e][1]+'" class="platforma">')};
+			});
+		});
+	});
+});
+
+function hide_all() {
+$.each(platforms, function (f) {
+	$("#spisok_"+platforms[f]).hide();
+});
+};
+
+function all_on() {
+hide_all();
+$("#box1").show();
+};
+
+$.each(platforms, function (f) {
+	window['pl_'+platforms[f][0]+'_on'] = function (){hide_all();$("#box1").hide();$("#spisok_"+platforms[f][0]).show();}
+});
+
+function pl_but_style(u) {
+	for (let i = 0; i < 17; i++) {
+		$("#pl_but_"+[i+1]).attr('style', '');
+	}
+	$("#"+[u]).attr('style', 'padding: 3px 12px; border: 5px solid white; border-radius: 8px;');
+}
+</script>
+</div>
+</body>
+</html>

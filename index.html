@@ -1,83 +1,96 @@
-<!DOCTYPE html >
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-<title>Metroidvania</title>
-<meta http-equiv="Content-Language" content="English" />
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<link rel="stylesheet" href="style.css">
+	<title>Metroidvania</title>
+	<meta http-equiv="Content-Language" content="English" />
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" href="css/style.css">
+	<script src="js/jquery-3.4.0.min.js"></script>
+	<script src="js/jquery.fancybox.js"></script>
+	<link rel="stylesheet" type="text/css" href="css/jquery.fancybox.css"/>
 </head>
 <body>
-
-<div id="wrap">
-
-<div id="header">
-<h1><a href="#">MetroidVania</a></h1>
+<div id="page">
+	<div id="wrap">
+		<div id="header"></div>
+		<div id="right">
+			<div class="articles" id="articles_test">
+				<table style="width: 100%;">
+					<tr>
+						<td>
+							<script type="text/javascript" src="https://vk.com/js/api/openapi.js?167"></script>
+							<!-- VK Widget -->
+							<div id="vk_article_-177332315_27771"></div>
+							<script type="text/javascript">
+								VK.Widgets.Article("vk_article_-177332315_27771", "@metroidvania-castlevania-grimoire-of-souls-poruganie-da-kupola-sozhzhenye");
+							</script>
+						</td>
+						<td>
+							<script type="text/javascript" src="https://vk.com/js/api/openapi.js?167"></script>
+							<!-- VK Widget -->
+							<div id="vk_article_-177332315_27887"></div>
+							<script type="text/javascript">
+								VK.Widgets.Article("vk_article_-177332315_27887", "@metroidvania-lubitelskie-castlevania");
+							</script>
+						</td>
+					</tr>
+				</table>
+				<br><br>
+				<img src="images/pic.jpg" alt="Example pic" style="border: 3px solid #ccc;" />
+				<br><br>
+			</div>
+		</div>
+		<div id="left">
+			<ul>
+				<li><div class="menu_buttons button_select" onclick="main_page_on()">Главная</div></li>
+				<li><div class="menu_buttons" onclick="games_list_on()">Список игр</div></li>
+				<li><div class="menu_buttons" onclick="games_map_on()">Карта игр</div></li>
+				<!-- <li><div class="menu_buttons">OST</div></li> -->
+				<!-- <li><div class="menu_buttons">Библиотека</div></li> -->
+				<!-- <li><div class="menu_buttons">Галерея</div></li> -->
+				<!-- <li><div class="menu_buttons">Ресурсы</div></li> -->
+			</ul>
+			<li>
+				<a href="#"><script type="text/javascript" src="https://vk.com/js/api/openapi.js?167"></script>
+					<!-- VK Widget -->
+					<div id="vk_groups"></div>
+					<script type="text/javascript">
+						VK.Widgets.Group("vk_groups", {mode: 4, wide:0 , height:400}, 177332315);
+					</script>
+				</a>
+			</li>
+		</div>
+		<div style="clear: both;"> </div>
+		<div id="footer">
+			Designed by NO4
+		</div>
+	</div>
 </div>
-
-<div id="right">
-<div class="articles">
-<table>
-    <tr>
-        <td><script type="text/javascript" src="https://vk.com/js/api/openapi.js?167"></script>
-
-<!-- VK Widget -->
-<div id="vk_article_-177332315_27771"></div>
-
-<script type="text/javascript">
-VK.Widgets.Article("vk_article_-177332315_27771", "@metroidvania-castlevania-grimoire-of-souls-poruganie-da-kupola-sozhzhenye");
-</script></td>
-        <td><script type="text/javascript" src="https://vk.com/js/api/openapi.js?167"></script>
-
-<!-- VK Widget -->
-<div id="vk_article_-177332315_27887"></div>
-
-<script type="text/javascript">
-VK.Widgets.Article("vk_article_-177332315_27887", "@metroidvania-lubitelskie-castlevania");
-</script></td>
-    </tr>
-	
-	
-	
-	
-	
-	
-</table>
-<br /><br />
-<img src="images/pic.jpg" alt="Example pic" style="border: 3px solid #ccc;" />
-<br /><br />
-
-</div>
-</div>
-
-<div id="left"> 
-
-<h3></h3>
-<ul>
-<li><a href="#">Список от A до Z</a></li> 
-<li><a href="#">OST</a></li> 
-<li><a href="#">Библиотека</a></li> 
-<li><a href="#">Галерея</a></li>
-<li><a href="#">Ресурсы</a></li>
- </ul>
- 
- 
-
-<li><a href="#"><script type="text/javascript" src="https://vk.com/js/api/openapi.js?167"></script>
-
-<!-- VK Widget -->
-<div id="vk_groups"></div>
-<script type="text/javascript">
-VK.Widgets.Group("vk_groups", {mode: 4, wide:0 , height:400}, 177332315);
-</script></a></li>
-
-</div>
-<div style="clear: both;"> </div>
-
-<div id="footer">
-Designed by NO4
-</div>
-</div>
-
-
+<script>
+function main_page_on(){
+$("#right").children().slice(1).remove();
+$("#articles_test").show();
+}
+function games_list_on(){
+	if ($("#games_list").length == 0){
+		$("#right").children().slice(1).remove();
+		$("#articles_test").hide();
+		$(function() {
+			$('<div>', {id: 'games_list'}).appendTo('#right').load('games.html');
+		});
+	};
+};
+function games_map_on(){
+	if ($("#iframe_games_map").length == 0){
+		$("#right").children().slice(1).remove();
+		$("#articles_test").hide();
+		$ ('<iframe>', {id: 'iframe_games_map', src: 'map-syte.html'}).attr('style', 'width: 100%; height: 530px; border: 0;').appendTo('#right')
+	};
+};
+$('.menu_buttons').click(function(){
+	$('.menu_buttons').removeClass('button_select');
+	$(this).addClass('button_select');
+});
+</script>
 </body>
 </html> 
